@@ -121,7 +121,7 @@ class NumberOfLangMenu(ft.Container):
 class TranslatedText(ft.Container):
     def __init__(self, lang_num, target_lang, results):
         super().__init__(
-            height=150,
+            # height=150,
             border=ft.border.all(1),
             border_radius=6,
             margin=ft.margin.only(top=10, left=30, right=0, bottom=10),
@@ -182,7 +182,7 @@ class Landing(ft.Container):
         )
 
         self.title = ft.Text(
-            value="Title",
+            value="Poly",
             size=30
         )
 
