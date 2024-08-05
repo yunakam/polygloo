@@ -124,7 +124,6 @@ class TranslatedText(ft.Container):
             # height=150,
             border=ft.border.all(1),
             border_radius=6,
-            margin=ft.margin.only(top=10, left=30, right=0, bottom=10),
         )
 
         self.lang_num = lang_num
@@ -172,6 +171,11 @@ class TranslatedText(ft.Container):
     def copy_on_click(self, e):
         get_text = self.text.value
         self.page.set_clipboard(get_text)
+        self.page.open(ft.SnackBar(
+            content=ft.Text(f"Text copied!"),
+            behavior=ft.SnackBarBehavior.FLOATING,
+            width=120,
+            ))
         print("Text copied")
 
 
@@ -201,12 +205,9 @@ class Landing(ft.Container):
 
 
 ### APP CLASS ###
-class Polygloo(ft.UserControl):
+class Polygloo(ft.Column):
     def __init__(self):
         super().__init__()
-
-        # self.auth_key = '65523bc2-d6ba-426e-b605-6646a6d1bc2c'
-        # self.translator = deepl.Translator(self.auth_key)
 
         self.number_of_target_lang = 3
         self.source_lang = None
@@ -217,8 +218,6 @@ class Polygloo(ft.UserControl):
         self.source_panel = ft.Container(
                                 content=SourceText(translate_clicked=self.translate_all_on_click),
                             )
-
-        # self.number_of_target_lang = number_of_target_lang
                   
         self.target_panel = ft.Column(
             controls=[TranslatedText(x, self.target_lang[x], self.results[x]) for x in range(self.number_of_target_lang)]
@@ -245,6 +244,7 @@ class Polygloo(ft.UserControl):
                         # Translation texts
                         ft.Container(
                             content=self.target_panel,
+                            margin=ft.margin.only(top=10, left=30, right=0, bottom=10),
                         ),  
                     ]
                 )
