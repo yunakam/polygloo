@@ -1,5 +1,6 @@
 import flet as ft
 import translate
+# import setting
 
 
 class LangDropDown(ft.Dropdown):
@@ -21,10 +22,10 @@ class SourceText(ft.Container):
     def __init__(self, translate_clicked):
         super().__init__(
             expand=True,
-            border=ft.border.all(3, color="blue"),
+            border=ft.border.all(3),
             border_radius=6,
             padding=10,
-            margin=ft.margin.only(top=10, left=0, right=0, bottom=10),
+            margin=ft.margin.only(top=20, left=0, right=0, bottom=10),
         )
 
         # currently not set (auto-detect the source language)
@@ -176,7 +177,6 @@ class TranslatedText(ft.Container):
             behavior=ft.SnackBarBehavior.FLOATING,
             width=120,
             ))
-        print("Text copied")
 
 
 class Landing(ft.Container):
@@ -209,6 +209,7 @@ class Polygloo(ft.Column):
     def __init__(self):
         super().__init__()
 
+        # self.appbar = 
         self.number_of_target_lang = 3
         self.source_lang = None
         self.target_lang = [[] for i in range(self.number_of_target_lang)]
@@ -229,11 +230,15 @@ class Polygloo(ft.Column):
         )
 
         self.controls=[
+            # TopBar(),
+
             ft.Container(
                 padding=ft.padding.only(left=20, right=20),
+                bgcolor="white",
+                border_radius=5,
                 content=ft.Column(
                     controls=[
-                        Landing(),
+                        # Landing(),
 
                         # Source text
                         self.source_panel,
@@ -285,23 +290,110 @@ class Polygloo(ft.Column):
         self.update()
 
 
+### SETTINGS CLASS ###
+
+class APIKey(ft.Container):
+    def __init__(self, service):
+        super().__init__(
+            margin=ft.margin.only(top=5, left=0, right=0, bottom=5),
+            blur=(0, 10),
+        )
+
+        self.service = ft.Text(service)
+
+        self.key = ft.TextField(
+            label=self.service.value,
+            content_padding=ft.padding.only(top=0, left=10, right=10, bottom=0),
+            border=ft.InputBorder.NONE,
+            bgcolor="white",
+        )
+
+        # self.content = ft.Row(
+        #     spacing=5,
+        #     alignment=ft.MainAxisAlignment.START,
+        #     controls=[
+        #         # self.service,
+        #         self.key,
+        #     ]
+        # )
+
+        self.content = self.key
+
+class Settings(ft.Container):
+    def __init__(self):
+        super().__init__(
+            padding=10,
+        )
+    
+        self.content = ft.Column(
+            controls=[
+                ft.Text("Enter your API keys"),
+                APIKey("DeepL"),
+                APIKey("Google Translate"),
+                APIKey("Chat GPT"),
+            ]
+        )
+
+
+### MAIN ###
 
 def main(page: ft.Page):
     page.horizontal_alignment=ft.CrossAxisAlignment.CENTER
-    page.scroll=ft.ScrollMode.ADAPTIVE
+    page.theme=ft.Theme(color_scheme_seed="lime")
     page.update()
 
-    # "Snackbar" - DeprecationWarning: snack_bar is deprecated in version 0.23.0
-    # page.snack_bar= ft.SnackBar(
-    #     content=ft.Text("Text copied!"),
-    #     duration=1000,
-    #     behavior=ft.SnackBarBehavior.FLOATING,
-    #     width=120,
-    # )
+    appbar = ft.AppBar(
+        actions=[
+            ft.PopupMenuButton(
+                items=[
+                    ft.PopupMenuItem(
+                        text="Settings",
+                        checked=False,
+                        on_click=lambda _: page.go("/settings")
+                    ),
+                ]
+            )
+        ]    
+    )
 
-    # render Layout objects
-    app = Polygloo()
-    page.add(ft.SafeArea(app))
+    app = ft.SafeArea(Polygloo())
+
+    def route_change(route):
+        page.views.clear()
+        page.views.append(
+            ft.View(
+                "/",
+                scroll=ft.ScrollMode.AUTO,
+                controls=[
+                    appbar,
+                    app,
+                ],
+            )
+        )
+        if page.route == "/settings":
+            page.views.append(
+                ft.View(
+                    "/settings",
+                    [
+                        ft.IconButton(
+                            icon=ft.icons.ARROW_BACK,
+                            tooltip="Back",
+                            on_click=lambda _: page.go("/"),
+                            ),
+                        Settings(),
+                    ],
+                )
+            )
+        page.update()
+
+    def view_pop(view):
+        page.views.pop()
+        top_view = page.views[-1]
+        page.go(top_view.route)
+
+    page.on_route_change = route_change
+    page.on_view_pop = view_pop
+    page.go(page.route)
 
 
 ft.app(main)
