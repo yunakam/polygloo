@@ -249,7 +249,7 @@ class Polygloo(ft.Column):
                         # Translation texts
                         ft.Container(
                             content=self.target_panel,
-                            margin=ft.margin.only(top=10, left=30, right=0, bottom=10),
+                            margin=ft.margin.only(top=10, left=30, right=0, bottom=20),
                         ),  
                     ]
                 )
@@ -360,7 +360,10 @@ def main(page: ft.Page):
 
     def route_change(route):
         page.views.clear()
-        page.views.append(
+        troute = ft.TemplateRoute(page.route)
+
+        if troute.match("/"):
+            page.views.append(
             ft.View(
                 "/",
                 scroll=ft.ScrollMode.AUTO,
@@ -370,7 +373,7 @@ def main(page: ft.Page):
                 ],
             )
         )
-        if page.route == "/settings":
+        elif troute.match("/settings"):
             page.views.append(
                 ft.View(
                     "/settings",
